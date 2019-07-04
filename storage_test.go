@@ -40,7 +40,7 @@ func NewTestingStorage() *TestingStorage {
 	}
 
 	r.access["9999"] = &AccessData{
-		Client:        r.clients["1234"],
+		ClientID:      r.clients["1234"].GetId(),
 		AuthorizeData: r.authorize["9999"],
 		AccessToken:   "9999",
 		ExpiresIn:     3600,
@@ -48,7 +48,7 @@ func NewTestingStorage() *TestingStorage {
 	}
 
 	r.access["r9999"] = &AccessData{
-		Client:        r.clients["1234"],
+		ClientID:      r.clients["1234"].GetId(),
 		AuthorizeData: r.authorize["9999"],
 		AccessData:    r.access["9999"],
 		AccessToken:   "9999",

@@ -60,7 +60,7 @@ type AccessRequest struct {
 // AccessData represents an access grant (tokens, expiration, client, etc)
 type AccessData struct {
 	// Client information
-	Client Client
+	ClientID string
 
 	// Authorize data, for authorization code
 	AuthorizeData *AuthorizeData
@@ -322,18 +322,18 @@ func (s *Server) handleRefreshTokenRequest(w *Response, r *http.Request) *Access
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "refresh_token=%s", "access data is nil")
 		return nil
 	}
-	if ret.AccessData.Client == nil {
+	if ret.AccessData.ClientID == "" {
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "refresh_token=%s", "access data client is nil")
 		return nil
 	}
-	if ret.AccessData.Client.GetRedirectUri() == "" {
-		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "refresh_token=%s", "access data client redirect uri is empty")
-		return nil
-	}
+	// if ret.AccessData.Client.GetRedirectUri() == "" {
+	// 	s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "refresh_token=%s", "access data client redirect uri is empty")
+	// 	return nil
+	// }
 
 	// client must be the same as the previous token
-	if ret.AccessData.Client.GetId() != ret.Client.GetId() {
-		s.setErrorAndLog(w, E_INVALID_CLIENT, errors.New("Client id must be the same from previous token"), "refresh_token=%s, current=%v, previous=%v", "client mismatch", ret.Client.GetId(), ret.AccessData.Client.GetId())
+	if ret.AccessData.ClientID != ret.Client.GetId() {
+		s.setErrorAndLog(w, E_INVALID_CLIENT, errors.New("Client id must be the same from previous token"), "refresh_token=%s, current=%v, previous=%v", "client mismatch", ret.Client.GetId(), ret.AccessData.ClientID)
 		return nil
 
 	}
@@ -468,7 +468,7 @@ func (s *Server) FinishAccessRequest(w *Response, r *http.Request, ar *AccessReq
 		if ar.ForceAccessData == nil {
 			// generate access token
 			ret = &AccessData{
-				Client:        ar.Client,
+				ClientID:      ar.Client.GetId(),
 				AuthorizeData: ar.AuthorizeData,
 				AccessData:    ar.AccessData,
 				RedirectUri:   redirectUri,
