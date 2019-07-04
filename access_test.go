@@ -443,7 +443,7 @@ func TestAccessAuthorizationCodePKCE(t *testing.T) {
 		server := NewServer(sconfig, testStorage)
 		server.AccessTokenGen = &TestingAccessTokenGen{}
 		server.Storage.SaveAuthorize(&AuthorizeData{
-			Client:              testStorage.clients["public-client"],
+			ClientID:            testStorage.clients["public-client"].GetId(),
 			Code:                "pkce-code",
 			ExpiresIn:           3600,
 			CreatedAt:           time.Now(),

@@ -189,21 +189,21 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "auth_code_request=%s", "authorization data is nil")
 		return nil
 	}
-	if ret.AuthorizeData.Client == nil {
+	if ret.AuthorizeData.ClientID == "" {
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "auth_code_request=%s", "authorization client is nil")
 		return nil
 	}
-	if ret.AuthorizeData.Client.GetRedirectUri() == "" {
-		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "auth_code_request=%s", "client redirect uri is empty")
-		return nil
-	}
+	// if ret.AuthorizeData.Client.GetRedirectUri() == "" {
+	// 	s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "auth_code_request=%s", "client redirect uri is empty")
+	// 	return nil
+	// }
 	if ret.AuthorizeData.IsExpiredAt(s.Now()) {
 		s.setErrorAndLog(w, E_INVALID_GRANT, nil, "auth_code_request=%s", "authorization data is expired")
 		return nil
 	}
 
 	// code must be from the client
-	if ret.AuthorizeData.Client.GetId() != ret.Client.GetId() {
+	if ret.AuthorizeData.ClientID != ret.Client.GetId() {
 		s.setErrorAndLog(w, E_INVALID_GRANT, nil, "auth_code_request=%s", "client code does not match")
 		return nil
 	}

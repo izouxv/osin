@@ -32,7 +32,7 @@ func NewTestingStorage() *TestingStorage {
 	}
 
 	r.authorize["9999"] = &AuthorizeData{
-		Client:      r.clients["1234"],
+		ClientID:    r.clients["1234"].GetId(),
 		Code:        "9999",
 		ExpiresIn:   3600,
 		CreatedAt:   time.Now(),

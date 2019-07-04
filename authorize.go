@@ -52,7 +52,7 @@ type AuthorizeRequest struct {
 // Authorization data
 type AuthorizeData struct {
 	// Client information
-	Client Client
+	ClientID string
 
 	// Authorization code
 	Code string
@@ -153,7 +153,7 @@ func (s *Server) HandleAuthorizeRequest(w *Response, r *http.Request) *Authorize
 		w.InternalError = err
 		return nil
 	} else {
-		ret.RedirectUri =  realRedirectUri
+		ret.RedirectUri = realRedirectUri
 	}
 
 	w.SetRedirect(ret.RedirectUri)
@@ -238,7 +238,7 @@ func (s *Server) FinishAuthorizeRequest(w *Response, r *http.Request, ar *Author
 		} else {
 			// generate authorization token
 			ret := &AuthorizeData{
-				Client:      ar.Client,
+				ClientID:    ar.Client.GetId(),
 				CreatedAt:   s.Now(),
 				ExpiresIn:   ar.Expiration,
 				RedirectUri: ar.RedirectUri,
