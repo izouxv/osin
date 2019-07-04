@@ -63,7 +63,7 @@ type AccessData struct {
 	ClientID string
 
 	// Authorize data, for authorization code
-	AuthorizeData *AuthorizeData
+	AuthorizeDataCode string
 
 	// Previous access data, for refresh token
 	AccessData *AccessData
@@ -468,14 +468,17 @@ func (s *Server) FinishAccessRequest(w *Response, r *http.Request, ar *AccessReq
 		if ar.ForceAccessData == nil {
 			// generate access token
 			ret = &AccessData{
-				ClientID:      ar.Client.GetId(),
-				AuthorizeData: ar.AuthorizeData,
-				AccessData:    ar.AccessData,
-				RedirectUri:   redirectUri,
-				CreatedAt:     s.Now(),
-				ExpiresIn:     ar.Expiration,
-				UserData:      ar.UserData,
-				Scope:         ar.Scope,
+				ClientID: ar.Client.GetId(),
+
+				AccessData:  ar.AccessData,
+				RedirectUri: redirectUri,
+				CreatedAt:   s.Now(),
+				ExpiresIn:   ar.Expiration,
+				UserData:    ar.UserData,
+				Scope:       ar.Scope,
+			}
+			if ar.AuthorizeData != nil {
+				ret.AuthorizeDataCode = ar.AuthorizeData.Code
 			}
 
 			// generate access token
@@ -495,8 +498,8 @@ func (s *Server) FinishAccessRequest(w *Response, r *http.Request, ar *AccessReq
 		}
 
 		// remove authorization token
-		if ret.AuthorizeData != nil {
-			w.Storage.RemoveAuthorize(ret.AuthorizeData.Code)
+		if ret.AuthorizeDataCode != "" {
+			w.Storage.RemoveAuthorize(ret.AuthorizeDataCode)
 		}
 
 		// remove previous access token
